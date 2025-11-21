@@ -32,62 +32,89 @@ El servidor inicia en `http://localhost:9876` (configurable con variable `PORT`)
 
 ## 📡 Endpoints API
 
-Todos los endpoints son **GET** bajo el prefijo `/api/productos/`:
+Todos los endpoints son **GET** y están disponibles bajo el prefijo `/api/productos/`:
 
-### 1. Productos Activos
-```http
-GET /api/productos/activos
-```
-**Respuesta:**
-```json
+| Endpoint | Método | Descripción | Query Params |
+|----------|--------|-------------|--------------|
+| `/api/productos/activos` | GET | Lista productos activos | - |
+| `/api/productos/precio-total-activos` | GET | Suma total en USD de activos | - |
+| `/api/productos/entregas` | GET | Productos con entrega desde año | `anio` (default: 2020) |
+| `/api/productos/convertir-precios` | GET | Precios convertidos a COP | `tasa` (default: 4250) |
+| `/api/productos/inventario-total` | GET | Stock total de todos los productos | - |
+
+---
+
+### 📌 Ejemplos de Respuestas
+
+#### 1. GET `/api/productos/activos`
+Retorna array con productos donde `activo === true`.
+
+```javascript
 {
   "message": "Productos activos",
-  "data": [{ "id": "PD001", "nombre": "Laptop Gamer Pro", ... }]
+  "data": [
+    {
+      "id": "PD001",
+      "nombre": "Laptop Gamer Pro",
+      "precioUSD": 1250,
+      "activo": true,
+      "stock": 15,
+      "fechaEntrega": "2023-05-20"
+    },
+    // ... más productos activos
+  ]
 }
 ```
 
-### 2. Precio Total de Activos
-```http
-GET /api/productos/precio-total-activos
-```
-**Respuesta:**
-```json
+#### 2. GET `/api/productos/precio-total-activos`
+Retorna suma de precios USD de productos activos.
+
+```javascript
 {
   "message": "Precio total de activos",
   "totalUSD": 2235.49
 }
 ```
 
-### 3. Entregas desde Año
-```http
-GET /api/productos/entregas?anio=2020
-```
-**Respuesta:**
-```json
+#### 3. GET `/api/productos/entregas?anio=2022`
+Retorna productos con `fechaEntrega >= anio`.
+
+```javascript
 {
-  "message": "Entregas desde 2020",
-  "data": [...]
+  "message": "Entregas desde 2022",
+  "data": [
+    {
+      "id": "PD001",
+      "nombre": "Laptop Gamer Pro",
+      "fechaEntrega": "2023-05-20",
+      // ... resto de propiedades
+    }
+  ]
 }
 ```
 
-### 4. Convertir Precios a COP
-```http
-GET /api/productos/convertir-precios?tasa=4250
-```
-**Respuesta:**
-```json
+#### 4. GET `/api/productos/convertir-precios?tasa=4300`
+Retorna productos con campo adicional `precioCOP` calculado.
+
+```javascript
 {
-  "message": "Precios convertidos a COP (tasa=4250)",
-  "data": [{ "id": "PD001", "precioCOP": 5312500, ... }]
+  "message": "Precios convertidos a COP (tasa=4300)",
+  "data": [
+    {
+      "id": "PD001",
+      "nombre": "Laptop Gamer Pro",
+      "precioUSD": 1250,
+      "precioCOP": 5375000,  // <- Campo agregado
+      // ... resto de propiedades
+    }
+  ]
 }
 ```
 
-### 5. Inventario Total
-```http
-GET /api/productos/inventario-total
-```
-**Respuesta:**
-```json
+#### 5. GET `/api/productos/inventario-total`
+Retorna suma de `stock` de todos los productos.
+
+```javascript
 {
   "message": "Inventario total",
   "totalStock": 555
